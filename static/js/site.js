@@ -25,7 +25,12 @@ angular.module('app', ['angularFileUpload'])
 
   $scope.showPreview = function(){
     $http($scope.createParam("GET", 'arraybuffer')).success(function(data, status, headers, config){
-      var b64 = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
+      var u8 = new Uint8Array(data);
+      binary = "";
+      for (var i = 0; i < u8.byteLength; i++) {
+        binary += String.fromCharCode(u8[i]);
+      }
+      var b64 = "data:image/png;base64," + btoa(binary);
       $scope.editor.showPreview(b64);
     }).error(function(data,status,headers,config){
       $window.alert("プレビューの取得に失敗しました。" + data);
