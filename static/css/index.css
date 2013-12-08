@@ -1,0 +1,28 @@
+#drop-area{
+    width:            100%;
+    height:           250px;
+    position:         relative;
+}
+
+#drop-overlay { display: none }
+
+.file-drag-over #drop-overlay {
+    width:               100%;
+    height:              100%;
+    position:        absolute;
+    opacity: 0.95;
+    display: table;
+    
+}
+
+.file-drag-over #drop-overlay * {
+    background-color: #ccccff;
+    height:              100%;
+    display:        table-cell;
+    text-align:     center;
+    vertical-align: middle;
+    font-size: xx-large;
+    border: dashed 5px #666666;
+    border-radius: 10px;
+}
+

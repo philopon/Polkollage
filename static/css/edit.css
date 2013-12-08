@@ -1,0 +1,15 @@
+/* ----------- edit    -------------- */
+
+body {
+    min-width: 900px;
+}
+
+.container {
+    width: 900px;
+}
+
+#toolbox {
+    margin-right:  5px;
+    margin-bottom: 5px;
+}
+
