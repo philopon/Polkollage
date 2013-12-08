@@ -1,1 +1,1 @@
-web: ./dist/build/Polkollage/Polkollage -p $PORT
+web: ./dist/build/Polkollage/Polkollage -p $PORT -e product
