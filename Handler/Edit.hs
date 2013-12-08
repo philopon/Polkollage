@@ -85,7 +85,3 @@ drawCircle c = do
   restore
 
 --------------------------------------------------------------------------------
--- CREATE TYPE color AS (red double precision, green double precision, blue double precision, alpha double precision);
--- CREATE TYPE arc AS (from_left double precision, from_top double precision, radius double precision, angle double precision, scaleX double precision, scaleY  double precision);
--- CREATE table images (id bigserial PRIMARY KEY, original bigint NOT NULL REFERENCES raw_images(id), data bytea NOT NULL, color color NOT NULL, circles arc[] NOT NULL);
-

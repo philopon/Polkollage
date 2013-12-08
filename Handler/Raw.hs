@@ -92,23 +92,6 @@ postRaw = do
       else return Nothing
     policy _ = return Nothing
 
-{-
-loadImage :: ByteString -> IO (ByteString, ByteString, Int, Int, Int, Int, Double)
-loadImage blob = withMagickWandGenesis $ do
-  (_,w) <- magickWand
-  readImageBlob w blob
-  width  <- getImageWidth w
-  height <- getImageHeight w
-  setImageFormat w "png"
-  raw       <- getImageBlob w
-  setImageFormat w "png"
-  let (s, w', h') = thumbnailSize 800 600 width height
-  resizeImage w w' h' triangleFilter 1
-
-  thumbnail <- getImageBlob w
-  return (raw, thumbnail, width, height, w', h', s)
--}
-
 loadImage :: ByteString -> ByteString -> IO (ByteString, ByteString, Int, Int, Int, Int, Double)
 loadImage ct blob = do
   image <- case ct of

@@ -1,3 +1,4 @@
 site_key.txt
 log/*.log
 .ghci
+Cairo_stub.h

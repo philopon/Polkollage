@@ -43,7 +43,3 @@ getPng = do
   (Only (Binary png)):_ <- with db $ query "SELECT data FROM images WHERE id = ?;" (Only ident)
   modifyResponse (setContentType "image/png")
   writeLBS png
-
--- CREATE TABLE raw_images(id bigserial PRIMARY KEY, sha1 bytea NOT NULL UNIQUE, data bytea NOT NULL, width integer NOT NULL, height integer NOT NULL, small bytea NOT NULL, small_width integer NOT NULL, small_height integer NOT NULL, scale double precision NOT NULL);
-
--- CREATE table images (id bigserial PRIMARY KEY, original bigint NOT NULL REFERENCES raw_images(id), data bytea NOT NULL, color color NOT NULL, circles arc[] NOT NULL);
