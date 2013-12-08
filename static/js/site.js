@@ -13,6 +13,8 @@ angular.module('app', ['angularFileUpload'])
       $scope.progress = 100 * evt.loaded / evt.total;
     }).success(function(data,status,headers,config){
       $window.location.href = "/edit/" + data.id;
+    }).error(function(data,status,headers,config){
+      $window.alert("アップロードに失敗しました。: " + data);
     });
   }
 })
@@ -25,12 +27,16 @@ angular.module('app', ['angularFileUpload'])
     $http($scope.createParam("GET", 'arraybuffer')).success(function(data, status, headers, config){
       var b64 = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
       $scope.editor.showPreview(b64);
+    }).error(function(data,status,headers,config){
+      $window.alert("プレビューの取得に失敗しました。" + data);
     });
   }
 
   $scope.saveImage = function(){
     $http($scope.createParam("POST")).success(function(data, status, headers, config){
       $window.location.href = "/image/" + data.id;
+    }).error(function(data,status,headers,config){
+      $window.alert("画像の作成に失敗しました。" + data);
     });
   }
 
