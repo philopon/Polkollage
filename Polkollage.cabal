@@ -33,9 +33,15 @@ Executable Polkollage
     text                      >= 0.11    && < 0.12,
     time                      >= 1.1     && < 1.5,
     xmlhtml                   >= 0.1,
-    snaplet-postgresql-simple,
-    cairo,
-    gd
+    snaplet-postgresql-simple >= 0.4,
+    cairo                     >= 0.12.5,
+    gd                        >= 3000.7,
+    aeson                     >= 0.6.2,
+    blaze-builder             >= 0.3.3,
+    postgresql-simple         >= 0.3.9,
+    attoparsec                >= 0.10.4,
+    vector                    >= 0.10.9,
+    SHA                       >= 1.6
 
   if flag(old-base)
     build-depends:
@@ -58,8 +64,8 @@ Executable Polkollage
     ghc-options: -threaded -w
   else
     if impl(ghc >= 6.12.0)
-      ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
-                   -fno-warn-orphans -fno-warn-unused-do-bind
+      ghc-options: -O2 -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
+                   -fno-warn-orphans -fno-warn-unused-do-bind -static
     else
-      ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
-                   -fno-warn-orphans
+      ghc-options: -O2 -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
+                   -fno-warn-orphans -static
