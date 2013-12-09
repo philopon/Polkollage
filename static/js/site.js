@@ -23,7 +23,10 @@ angular.module('app', ['angularFileUpload'])
 
   var init_color = 'rgba(0, 0, 255, 0.8)';
 
+  $scope.inQuery = false;
+
   $scope.showPreview = function(){
+    $scope.inQuery = true;
     $http($scope.createParam("GET", 'arraybuffer')).success(function(data, status, headers, config){
       var u8 = new Uint8Array(data);
       binary = "";
@@ -32,16 +35,21 @@ angular.module('app', ['angularFileUpload'])
       }
       var b64 = "data:image/png;base64," + btoa(binary);
       $scope.editor.showPreview(b64);
+      $scope.inQuery = false;
     }).error(function(data,status,headers,config){
       $window.alert("プレビューの取得に失敗しました。" + data);
+      $scope.inQuery = false;
     });
   }
 
   $scope.saveImage = function(){
+    $scope.inQuery = true;
     $http($scope.createParam("POST")).success(function(data, status, headers, config){
       $window.location.href = "/image/" + data.id;
+      $scope.inQuery = false;
     }).error(function(data,status,headers,config){
       $window.alert("画像の作成に失敗しました。" + data);
+      $scope.inQuery = false;
     });
   }
 

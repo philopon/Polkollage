@@ -17,7 +17,7 @@
     <div class="btn-toolbar" role="toolbar">
       <div class="btn-group-vertical">
 
-        <button id="submitButton" type="button" ng-click="submit()" class="btn btn-default">
+        <button id="submitButton" type="button" ng-click="submit()" ng-disabled="inQuery" class="btn btn-default">
           <span ng-hide="previewShown" class="has-tooltip glyphicon glyphicon-ok"></span>
           <span ng-show="previewShown" class="has-tooltip glyphicon glyphicon-save"></span>
         </button>
