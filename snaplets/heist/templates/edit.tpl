@@ -2,9 +2,9 @@
 <bind tag="in-header">
   <link rel="stylesheet" href="/css/edit.css" type="text/css" />
   <link rel="stylesheet" href="/css/colorpicker.css" type="text/css" />
-  <script src="/js/jquery-2.0.3.min.js"/>
+  <script src="${jquery.js}"/>
   <script src="/js/fabric.min.js"/>
-  <script src="/js/bootstrap.min.js"/>
+  <script src="${bootstrap.js}"/>
   <script src="/js/bootstrap-colorpicker.js"/>
   <script src="/js/edit.js"/>
 </bind>

@@ -26,6 +26,7 @@ import           Text.XmlHtml(Node(..))
 import qualified Handler.Raw   as Raw
 import qualified Handler.Edit  as Edit
 import qualified Handler.Image as Image
+import URL
 
 getIndex :: AppHandler ()
 getIndex = with sess $ do
@@ -54,7 +55,8 @@ routes = [ ("",          serveDirectory "static")
 app :: SnapletInit App App
 app = makeSnaplet "app" "An snaplet example application." Nothing $ do
     h <- nestSnaplet "heist" heist $ heistInit "templates"
-    addConfig h $ mempty { hcLoadTimeSplices = "siteTitle" ## return [TextNode "Polkollage"] }
+    addConfig h $ mempty { hcLoadTimeSplices =
+                              ("siteTitle" ## return [TextNode "Polkollage"]) <> urlSplice }
     d <- nestSnaplet "db" db pgsInit
     s <- nestSnaplet "sess" sess $
            initCookieSessionManager "site_key.txt" "sess" (Just 3600)
