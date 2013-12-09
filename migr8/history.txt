@@ -1,0 +1,3 @@
+# -*- coding: utf-8 -*-
+kbpg5537   # [philopon] initial schema
+mrjw4765   # [philopon] add 'delete_key' to 'images' table

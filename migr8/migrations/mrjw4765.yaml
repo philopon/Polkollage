@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+
+version:     mrjw4765
+desc:        add 'delete_key' to 'images' table
+author:      philopon
+vars:
+  - table:   table123
+  - column:  column123
+  - index:   ${table}_${column}_idx
+  - unique:  ${table}_${column}_unq
+
+up: |
+  ---
+  --- add column or unique constraint
+  ---
+  alter table images add column delete_key      bytea default E'\\x553d3582d3b940ff1a732241dca80dd27f4c5774' not null;
+  alter table images add column delete_key_salt bytea default 'saltsaltsaltsaltsasl' not null;
+down: |
+  ---
+  --- drop column or unique constraint
+  ---
+  alter table images drop column delete_key;
+  alter table images drop column delete_key_salt;
+

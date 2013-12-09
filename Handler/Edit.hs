@@ -10,8 +10,8 @@ import "mtl"     Control.Monad.Trans
 import           Data.ByteString (ByteString)
 import           Snap.Core
 import           Snap.Snaplet
-import           Snap.Snaplet.PostgresqlSimple
 import qualified Data.ByteString.Char8 as SC
+import qualified Data.ByteString       as S
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Aeson as JSON
 
@@ -20,9 +20,11 @@ import           Application
 import           Common
 import           Graphics.Rendering.Cairo
 import           Cairo
-import qualified Data.Vector as V
-import Data.Int
 import Data
+import Query
+import qualified System.Random.MWC as MWC
+import           Data.Digest.Pure.SHA
+import qualified Data.Vector.Unboxed as U
 
 install :: ByteString -> Initializer App App ()
 install pfx = addRoutes [(pfx </> "", method GET getImage <|> method POST postImage)]
@@ -35,27 +37,32 @@ getImage = do
 
 postImage :: AppHandler ()
 postImage = do
-  (ident, dat, circles, color) <- createImage False
-  ret:_ <- with db $ query
-           "INSERT INTO images(original, data, color, circles) VALUES (?,?,?,?) RETURNING id"
-           (ident, Binary dat, color, V.fromList circles)
-  writeJSON $ JSON.object ["id" JSON..= (fromOnly ret::Int64)]
+  (orig, dat, circles, color) <- createImage False
+  Just pwd <- getParam "deletePassword"
+  salt     <- liftIO genSalt
+  let storePass = bytestringDigest . sha1 $ L.fromChunks [pwd, salt] :: L.ByteString
 
-createImage :: Bool -> AppHandler (Int64, L.ByteString, [Circle], Color)
+  ident <- with db $ Query.insertImage orig dat color circles storePass salt
+  writeJSON $ JSON.object ["id" JSON..= ident]
+
+genSalt :: IO S.ByteString
+genSalt = MWC.withSystemRandom . MWC.asGenIO $ \gen -> do
+  v <- S.pack . U.toList <$> MWC.uniformVector gen 20
+  return v
+  
+
+createImage :: Bool -> AppHandler (Int, L.ByteString, [Circle], Color)
 createImage isPreview = do
-  Just (ident,_) <- (\mbp -> mbp >>= SC.readInteger) <$> getParam "ident"
-  Just circles   <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "data"
-  Just color     <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "color"
-
-  (d, s):_ <- with db $
-              if isPreview
-              then query "SELECT small, scale FROM raw_images WHERE id = ?;" (Only ident)
-              else query "SELECT data,  scale FROM raw_images WHERE id = ?;" (Only ident)
+  Just (ident',_) <- (\mbp -> mbp >>= SC.readInteger)                    <$> getParam "ident"
+  Just circles    <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "data"
+  Just color      <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "color"
+  let ident = fromIntegral ident'
+  (d, s) <- with db $ getImageFromRawImagesById isPreview ident
   let sCircles = if isPreview
                  then circles
                  else map (scaleCircle s) circles
-  dat <- liftIO $ renderImage color sCircles (fromBinary d)
-  return (fromIntegral ident,dat, circles, color)
+  dat <- liftIO $ renderImage color sCircles d
+  return (ident, dat, circles, color)
 
 renderImage :: Color -> [Circle] -> ByteString -> IO L.ByteString
 renderImage color circles dat = withImageSurfaceFromPNGData dat $ \img -> do
@@ -84,4 +91,3 @@ drawCircle c = do
   fill
   restore
 
---------------------------------------------------------------------------------

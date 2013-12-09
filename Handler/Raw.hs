@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction, PackageImports, TupleSections #-}
+{-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction, PackageImports, TupleSections, ScopedTypeVariables #-}
 
 module Handler.Raw(install) where
 
@@ -8,10 +8,8 @@ import           Control.Monad
 import "mtl"     Control.Monad.Trans
 import           Data.ByteString (ByteString)
 import qualified Data.Text.Encoding as T
-import           Data.Int(Int64)
 import           Snap.Core
 import           Snap.Snaplet
-import           Snap.Snaplet.PostgresqlSimple
 import           Snap.Snaplet.Session
 import           Snap.Util.FileUploads
 import qualified Data.ByteString.Char8 as SC
@@ -25,8 +23,9 @@ import           Data.Digest.Pure.SHA
 import           Data.Maybe
 import           Common
 import           Graphics.GD
-
--- CREATE TABLE raw_images(id bigserial PRIMARY KEY, sha1 bytea NOT NULL UNIQUE, data bytea NOT NULL, width integer NOT NULL, height integer NOT NULL, small bytea NOT NULL, small_width integer NOT NULL, small_height integer NOT NULL, scale double precision NOT NULL);
+import           Query
+import           Control.Monad.CatchIO
+import           Control.Exception hiding(catch)
 
 install :: ByteString -> Initializer App App ()
 install pfx = addRoutes
@@ -36,16 +35,12 @@ install pfx = addRoutes
 
 getRaw :: AppHandler ()
 getRaw = getParam "id" >>= \idprm -> case idprm of
-  Nothing  -> badRequest
-  Just ids -> case fromIntegral . fst <$> SC.readInteger ids :: Maybe Int64 of
-    Nothing   -> badRequest
+  Nothing  -> return ()
+  Just ids -> case fromIntegral . fst <$> SC.readInteger ids of
+    Nothing   -> return ()
     Just idnt -> 
-      with db $ query "SELECT small FROM raw_images WHERE id = ?;" (Only idnt) >>= \q ->
-      case q of
-        []                    -> notFound
-        (Only (Binary dat)):_ -> do
-          modifyResponse (setContentType "image/png")
-          writeLBS dat
+      with db (Query.selectSmallImageFromRawImagesById idnt) >>= \dat ->
+      modifyResponse (setContentType "image/png") >> writeLBS dat
 
 postRaw :: AppHandler ()    
 postRaw = do
@@ -66,20 +61,15 @@ postRaw = do
   case catMaybes posted of
     []                         -> fail "no image field"
     (hash, ct, dat):_ -> do
-      idnt <- with db $ do
-        r <- query "SELECT id FROM raw_images WHERE sha1 = ?" (Only $ Binary hash)
-        if not $ null r
-          then return (Left . fromOnly $ head r)
-          else do
-          (raw, thumb, width, height, thW, thH, scale) <- liftIO $ loadImage ct (L.toStrict dat)
-          Right . fromOnly . head <$>
-            query "INSERT INTO raw_images(sha1, data, width, height, small, small_height, small_width, scale) VALUES (?,?,?,?,?,?,?,?) RETURNING id"
-            (Binary hash, Binary raw, width, height, Binary thumb, thH, thW, scale)
-
+      idnt <- with db $
+              Query.selectIdFromRawImagesBySha1 hash `catch` \(_::SomeException) ->
+              ( do (raw, small, width, height, w', h', scale) <- liftIO $ loadImage ct (L.toStrict dat)
+                   Query.insertRawImage hash raw width height small w' h' scale)
+            
       writeJSON $ JSON.object
-        [ "id"          .= (either id id idnt :: Int64)
-        , "status-code" .= (either (const 1) (const 0) idnt :: Int)
-        , "status"      .= (either (const "Already exists") (const "Uploaded") idnt :: ByteString)
+        [ "id"          .= (idnt :: Int)
+        , "status-code" .= (0    :: Int)
+        , "status"      .= ("Ok" :: ByteString)
         ]
 
   where
