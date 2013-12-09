@@ -1,33 +1,20 @@
 {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction, PackageImports, TupleSections, TemplateHaskell #-}
 
-module Data( Circle(..)
+module Polkollage.Data( Circle(..)
            , left, top, radius, angle, scaleX, scaleY
            , Color(..) ) where
 
 ------------------------------------------------------------------------------
 import           Control.Applicative
 import           Control.Lens
-
-
-
-
-
-
-
-
 import qualified Data.Aeson as JSON
 import           Data.Aeson.TH
 ------------------------------------------------------------------------------
-
-
-
 import qualified Data.Vector as V
 import           Data.Attoparsec.Number
 import           Database.PostgreSQL.Simple.ToField
-
 import           Blaze.ByteString.Builder.Char.Utf8
 import Data.Monoid
-
 
 
 data Circle = Circle { _left   :: Double

@@ -21,9 +21,9 @@ import           Data.Aeson((.=))
 import           Application
 import           Data.Digest.Pure.SHA
 import           Data.Maybe
-import           Common
+import           Polkollage.Common
 import           Graphics.GD
-import           Query
+import qualified Polkollage.Query as Query
 import           Control.Monad.CatchIO
 import           Control.Exception hiding(catch)
 

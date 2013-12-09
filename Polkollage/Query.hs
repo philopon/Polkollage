@@ -1,5 +1,5 @@
 {-#LANGUAGE OverloadedStrings#-}
-module Query where
+module Polkollage.Query where
 
 import Control.Monad
 import Snap.Snaplet.PostgresqlSimple
@@ -7,7 +7,7 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString      as S
 import Snap(MonadSnap)
 import qualified Data.Vector as V
-import Data
+import Polkollage.Data
 import Data.Int(Int64)
 
 getByUnique :: Monad m => m [b] -> m b

@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP, NoMonomorphismRestriction, OverloadedStrings #-}
 
-module URL(urlSplice) where
+module Polkollage.URL(urlSplice) where
 
 import Heist
 import Data.Monoid

@@ -17,11 +17,11 @@ import qualified Data.Aeson as JSON
 
 ------------------------------------------------------------------------------
 import           Application
-import           Common
+import           Polkollage.Common
 import           Graphics.Rendering.Cairo
-import           Cairo
-import Data
-import Query
+import           Polkollage.Cairo
+import           Polkollage.Data
+import qualified Polkollage.Query as Query
 import qualified System.Random.MWC as MWC
 import           Data.Digest.Pure.SHA
 import qualified Data.Vector.Unboxed as U
@@ -57,7 +57,7 @@ createImage isPreview = do
   Just circles    <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "data"
   Just color      <- (\mbp -> join $ mbp >>= JSON.decode . L.fromStrict) <$> getParam "color"
   let ident = fromIntegral ident'
-  (d, s) <- with db $ getImageFromRawImagesById isPreview ident
+  (d, s) <- with db $ Query.getImageFromRawImagesById isPreview ident
   let sCircles = if isPreview
                  then circles
                  else map (scaleCircle s) circles

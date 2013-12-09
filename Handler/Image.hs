@@ -12,19 +12,19 @@ import qualified Data.ByteString.Char8 as SC
 import qualified Data.ByteString.Lazy  as L
 ------------------------------------------------------------------------------
 import           Application
-import           Common
+import           Polkollage.Common
 import qualified Data.Text   as T
 import           Data.Monoid
 import           Heist
 import           Snap.Snaplet.Heist
 import           Text.XmlHtml(Node(..))
-import Query
+import qualified Polkollage.Query as Query
 import           Data.Digest.Pure.SHA
 import qualified Data.Aeson as JSON
 import Control.Monad.CatchIO
 import Control.Exception hiding(catch)
 
-import "mtl" Control.Monad.Trans
+
 
 install :: ByteString -> Initializer App App ()
 install pfx = addRoutes [ (pfx,                method GET getImage <|> method DELETE deleteImage)
@@ -61,12 +61,12 @@ getPng = do
 deleteImage :: AppHandler ()
 deleteImage = do
   Just (ident',_) <- (\mbi -> mbi >>= SC.readInteger) <$> getParam "id"
-  Just pass       <- getParam "deletePassword"
+  Just passwd     <- getParam "deletePassword"
   let ident = fromIntegral ident'
   with db $ do
-    (key,salt) <- selectDeleteKeyById ident
-    if (bytestringDigest . sha1 $ L.fromChunks [pass,salt]) == L.fromStrict key
-      then do i <- deleteImageById ident
+    (key,salt) <- Query.selectDeleteKeyById ident
+    if (bytestringDigest . sha1 $ L.fromChunks [passwd,salt]) == L.fromStrict key
+      then do i <- Query.deleteImageById ident
               writeJSON $ JSON.object ["deleted" JSON..= i]
       else modifyResponse (setResponseCode 401) >>
            writeJSON (JSON.object ["error" JSON..= ("Unauthorized"::String)])

@@ -26,7 +26,7 @@ import           Text.XmlHtml(Node(..))
 import qualified Handler.Raw   as Raw
 import qualified Handler.Edit  as Edit
 import qualified Handler.Image as Image
-import URL
+import           Polkollage.URL
 
 getIndex :: AppHandler ()
 getIndex = with sess $ do

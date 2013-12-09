@@ -1,6 +1,6 @@
 {-#LANGUAGE ForeignFunctionInterface#-}
 
-module Cairo(surfaceWriteToPNGData, withImageSurfaceFromPNGData) where
+module Polkollage.Cairo(surfaceWriteToPNGData, withImageSurfaceFromPNGData) where
 
 import Control.Applicative
 import Control.Exception

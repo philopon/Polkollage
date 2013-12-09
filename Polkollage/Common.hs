@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, NoMonomorphismRestriction, PackageImports, TupleSections #-}
 
-module Common where
+module Polkollage.Common where
 
 import           Snap.Core
 import qualified Data.ByteString as S
